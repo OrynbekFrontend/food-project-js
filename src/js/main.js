@@ -101,4 +101,54 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     setClock('.timer', deadline);
+
+    // modal 
+
+    const openModal = document.querySelectorAll('[data-modal]'),
+          closeModalWindow = document.querySelector('[data-close]'),
+          modalWindow = document.querySelector('.modal');
+
+    function openModalWindow() {
+        modalWindow.classList.add('show');
+        modalWindow.classList.remove('hide');
+        document.body.style.overflow = 'hidden';
+        clearInterval(modalTimerId);
+        // modalWindow.classList.toggle('show');
+    };
+
+    function closeModal() {
+        modalWindow.classList.add('hide');
+        modalWindow.classList.remove('show');
+        document.body.style.overflow = '';
+        // modalWindow.classList.toggle('show');
+    };
+
+    openModal.forEach(item => {
+        item.addEventListener('click', openModalWindow);
+    });
+
+    closeModalWindow.addEventListener('click', closeModal);
+
+    modalWindow.addEventListener('click', (event) => {
+        if (event.target === modalWindow) {
+            closeModal();
+        }
+    }); // при клике за пределы модального окна наше окно закрывается
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Escape' && modalWindow.classList.contains('show')) {
+            closeModal();
+        }
+    }); // аналогичная ситуация только при клике на esc
+
+    const modalTimerId = setTimeout(openModalWindow, 35000);
+
+    function showModalByScroll() {
+        if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
+            openModalWindow();
+            window.removeEventListener('scroll', showModalByScroll);
+        }
+    };
+
+    window.addEventListener('scroll', showModalByScroll);
 });
