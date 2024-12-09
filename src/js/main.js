@@ -221,4 +221,55 @@ window.addEventListener('DOMContentLoaded', () => {
         21,
         ".menu .container"
     ).render();
+
+    
+    // реализация отправки данных на сервер
+
+    const forms = document.querySelectorAll('form');
+    const message = {
+        loading: 'Загрузка...',
+        success: 'Ваши данные успешно отправлены',
+        error: "что то пошло не так"
+    };
+
+    forms.forEach(item => {
+        postData(item);
+    })
+
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = message.loading;
+            form.append(statusMessage);
+
+            const request = new XMLHttpRequest();
+            request.open('POST', '.././server.php');
+            request.setRequestHeader('Content-type', 'application.json');
+            const formData = new FormData(form); // это специальный объект который позволяет нам с определенной формой сформировать данные в виде ключ: значение
+
+            const object = {}; // чтобы данные были в виде json формата
+            formData.forEach((values, keys) => {
+                object[keys] = values;
+            })
+            const json = JSON.stringify(object)
+
+            request.send(json);
+
+            request.addEventListener('load', () => { 
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    form.reset();
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000)
+                } else {
+                    statusMessage.textContent = message.error;
+                }
+            });
+        });  
+    };
 });
