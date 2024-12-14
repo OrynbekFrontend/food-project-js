@@ -245,8 +245,7 @@ window.addEventListener('DOMContentLoaded', () => {
             `
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', '.././server.php');
+            
             request.setRequestHeader('Content-type', 'application.json');
             const formData = new FormData(form); // это специальный объект который позволяет нам с определенной формой сформировать данные в виде ключ: значение
 
@@ -254,20 +253,26 @@ window.addEventListener('DOMContentLoaded', () => {
             formData.forEach((values, keys) => {
                 object[keys] = values;
             })
-            const json = JSON.stringify(object)
 
-            request.send(json);
-
-            request.addEventListener('load', () => { 
-                if (request.status === 200) {
-                    console.log(request.response);
-                    showModalThanks(message.success);
-                    form.reset();
-                    statusMessage.remove();
-                } else {
-                    showModalThanks(message.error);
-                }
-            });
+            fetch('.././server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application.json'
+                },
+                body: JSON.stringify(object)
+            })
+            .then(data => data.text())
+            .then(data => {
+                console.log(data);
+                showModalThanks(message.success);
+                statusMessage.remove();
+            })
+            .catch(() => {
+                showModalThanks(message.error);
+            })
+            .finally(() => {
+                form.reset()
+            })
         });  
     };
 
